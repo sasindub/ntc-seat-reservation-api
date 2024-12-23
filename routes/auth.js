@@ -1,4 +1,5 @@
 import { Router } from "express";
+import User from "../models/User.js"; // Ensure this is the correct path to your User model
 const router = Router();
 
 /**
@@ -14,26 +15,72 @@ const router = Router();
  *           schema:
  *             type: object
  *             required:
- *               - name
- *               - email
+ *               - firstName
+ *               - lastName
+ *               - username
  *               - password
+ *               - NIC
+ *               - mobileNo
+ *               - email
+ *               - role
  *             properties:
- *               name:
+ *               firstName:
  *                 type: string
- *               email:
+ *               lastName:
+ *                 type: string
+ *               username:
  *                 type: string
  *               password:
  *                 type: string
  *                 format: password
+ *               NIC:
+ *                 type: string
+ *               mobileNo:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               address:
+ *                 type: string
+ *                 default: null
+ *               role:
+ *                 type: string
+ *                 enum: ["admin", "commuter", "bus_operator"]
  *     responses:
  *       201:
  *         description: User registered successfully
  *       400:
- *         description: Bad request
+ *         description: Missing required fields
+ *       500:
+ *         description: Internal Server Error
  */
-router.post("/register", (req, res) => {
-  // Registration logic
-  res.status(201).send("User registered!");
+router.post("/register", async (req, res) => {
+  try {
+    const { firstName, lastName, username, password, NIC, mobileNo, email, address, role } = req.body;
+
+    // Perform validation if necessary
+    if (!firstName || !lastName || !username || !password || !NIC || !mobileNo || !email || !role) {
+      return res.status(400).send("Missing required fields.");
+    }
+
+    // Create a new user
+    const user = new User({
+      firstName,
+      lastName,
+      username,
+      password,
+      NIC,
+      mobileNo,
+      email,
+      address, // Optional field
+      role,
+    });
+
+    await user.save();
+
+    res.status(201).send("User registered successfully!");
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
 });
 
 export default router;

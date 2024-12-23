@@ -2,10 +2,17 @@ import express from "express";
 import { swaggerUi, swaggerDocs } from "./config/swagger.js";
 import dotenv from "dotenv";
 import { connectDB } from "./config/db.js";
+import userRoutes from "./routes/auth.js";  // Import the new auth router
 
 dotenv.config();
 
 const app = express();
+
+app.use(express.json());
+
+//use the routes 
+
+app.use("/api/auth", userRoutes);  // Register the routes under /api/auth
 
 // Simple Home Route
 app.get("/", (req, res) => {
