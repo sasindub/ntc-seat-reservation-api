@@ -2,7 +2,7 @@ import express from "express";
 import { swaggerUi, swaggerDocs } from "./config/swagger.js";
 import dotenv from "dotenv";
 import { connectDB } from "./config/db.js";
-import userRoutes from "./routes/auth.js";  // Import the new auth router
+import userRoutes from "./routes/userRoutes.js";  // Import the new auth router
 
 dotenv.config();
 
@@ -10,9 +10,28 @@ const app = express();
 
 app.use(express.json());
 
-//use the routes 
+import transporter from "./config/mail.js";
 
-app.use("/api/auth", userRoutes);  // Register the routes under /api/auth
+
+// const mailOptions = {
+//   from: process.env.EMAIL,
+//   to: "sasindulakshithabandara@gmail.com",
+//   subject: "Test Email",
+//   text: "This is a test email from Nodemailer.",
+// };
+
+// transporter.sendMail(mailOptions, (error, info) => {
+//   if (error) {
+//     console.error("Error sending email:", error);
+//   } else {
+//     console.log("Email sent:", info.response);
+//   }
+// });
+
+
+
+// Routes
+app.use("/api/users", userRoutes);
 
 // Simple Home Route
 app.get("/", (req, res) => {
