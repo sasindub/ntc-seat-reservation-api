@@ -91,7 +91,7 @@ router.delete("/:id", deleteUser);
 
 /**
  * @swagger
- * /{id}:
+ * /api/users/{id}:
  *   put:
  *     summary: Update a user by ID
  *     tags: [Users]
@@ -124,6 +124,11 @@ router.delete("/:id", deleteUser);
  *             example:
  *               firstName: Jane
  *               email: jane.doe@example.com
+ *               lastName: kamal
+ *               mobileNo: 0774189665
+ *               NIC: 200258695698
+ *               address: address
+ *               
  *     responses:
  *       200:
  *         description: User updated successfully
@@ -144,7 +149,7 @@ router.put("/:id", updateUser);
 
 /**
  * @swagger
- * /search/{query}:
+ * /api/users/search/{query}:
  *   get:
  *     summary: Search user by email, mobile number, or NIC
  *     tags: [Users]
