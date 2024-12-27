@@ -59,4 +59,4 @@ jobs:
           app-name: 'ntc-seat-reservation-api'
           slot-name: 'Production'
           package: .
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_FB2EB0B6896147E7B4F3795260E80824 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_A7805DAD01444989B1AEA55D0F20BD36 }}
