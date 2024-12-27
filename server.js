@@ -2,7 +2,8 @@ import express from "express";
 import { swaggerUi, swaggerDocs } from "./config/swagger.js";
 import dotenv from "dotenv";
 import { connectDB } from "./config/db.js";
-import userRoutes from "./routes/userRoutes.js";  // Import the new auth router
+import userRoutes from "./routes/userRoutes.js"; 
+import authRoutes from "./routes/authRoutes.js"; 
 
 dotenv.config();
 
@@ -32,6 +33,7 @@ import transporter from "./config/mail.js";
 
 // Routes
 app.use("/api/users", userRoutes);
+app.use("/api/auth", authRoutes);
 
 // Simple Home Route
 app.get("/", (req, res) => {

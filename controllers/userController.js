@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import User from "../models/User.js";
 import transporter from "../config/mail.js";
+import mongoose from "mongoose";
 
 //register user
 export const registerUser = async (req, res) => {
@@ -110,7 +111,9 @@ export const registerUser = async (req, res) => {
     console.error(error);
     res
       .status(500)
-      .json({ message: `Something went wrong. Please try again later. ${error}` });
+      .json({
+        message: `Something went wrong. Please try again later. ${error}`,
+      });
   }
 };
 
@@ -118,6 +121,11 @@ export const registerUser = async (req, res) => {
 export const deleteUser = async (req, res) => {
     try {
       const { id } = req.params;
+  
+      // Validate MongoDB ObjectId
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ message: "Invalid user ID format." });
+      }
   
       const user = await User.findByIdAndDelete(id);
       if (!user) {
@@ -127,48 +135,76 @@ export const deleteUser = async (req, res) => {
       res.status(200).json({ message: "User deleted successfully." });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: "Something went wrong. Please try again later." });
+      res
+        .status(500)
+        .json({ message: "Something went wrong. Please try again later." });
     }
-  };
+}
 
+//update user
+export const updateUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updateData = req.body;
 
-  //update user
-  export const updateUser = async (req, res) => {
-    try {
-      const { id } = req.params;
-      const updateData = req.body;
-  
-      // Validate NIC, email, and mobile number if provided
-      if (updateData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(updateData.email)) {
-        return res.status(400).json({ message: "Invalid email format." });
-      }
-  
-      if (updateData.mobileNo && !/^\d{10}$/.test(updateData.mobileNo)) {
-        return res.status(400).json({ message: "Mobile number must be 10 digits." });
-      }
-  
-      if (updateData.NIC && !/^(\d{9}[vV]|\d{12})$/.test(updateData.NIC)) {
-        return res.status(400).json({
-          message: "NIC must be 12 digits or 10 digits followed by 'V' or 'v'.",
-        });
-      }
-  
-      const updatedUser = await User.findByIdAndUpdate(id, updateData, {
-        new: true, // Return updated document
-        runValidators: true, // Ensure schema validations are run
+    // Validate NIC, email, and mobile number if provided
+    if (
+      updateData.email &&
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(updateData.email)
+    ) {
+      return res.status(400).json({ message: "Invalid email format." });
+    }
+
+    if (updateData.mobileNo && !/^\d{10}$/.test(updateData.mobileNo)) {
+      return res
+        .status(400)
+        .json({ message: "Mobile number must be 10 digits." });
+    }
+
+    if (updateData.NIC && !/^(\d{9}[vV]|\d{12})$/.test(updateData.NIC)) {
+      return res.status(400).json({
+        message: "NIC must be 12 digits or 10 digits followed by 'V' or 'v'.",
       });
-  
-      if (!updatedUser) {
-        return res.status(404).json({ message: "User not found." });
-      }
-  
-      res.status(200).json({ message: "User updated successfully.", data: updatedUser });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: "Something went wrong. Please try again later." });
     }
-  };
-  
-  
 
+    const updatedUser = await User.findByIdAndUpdate(id, updateData, {
+      new: true, // Return updated document
+      runValidators: true, // Ensure schema validations are run
+    });
 
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    res
+      .status(200)
+      .json({ message: "User updated successfully.", data: updatedUser });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "Something went wrong. Please try again later." });
+  }
+};
+
+//search by email, mobile, and nic
+export const searchUser = async (req, res) => {
+  try {
+    const { query } = req.params;
+
+    const user = await User.findOne({
+      $or: [{ email: query }, { mobileNo: query }, { NIC: query }],
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    res.status(200).json({ message: "User found.", data: user });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "Something went wrong. Please try again later." });
+  }
+};
